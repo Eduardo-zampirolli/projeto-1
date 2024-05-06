@@ -10,3 +10,90 @@ informacoes ={
 def troca(posicao1,posicao2):
 
 def permutacao
+
+
+
+
+
+
+
+
+
+#!/usr/bin/env python3
+"""
+Implemente aqui o seu código para o jogador.
+
+Seu principal objetivo é implementar a função `player`, que deve retornar uma lista de 4 cores, o seu próximo palpite.
+Como exemplo, a função abaixo retorna um palpite aleatório.
+
+Dicas:
+- Você pode implementar outras funções para auxiliar a função `player`.
+- Você pode salvar informações entre os palpites usando variáveis globais (fora de qualquer função).
+"""
+from colors import *
+from random import sample
+
+
+# Cores disponíveis para o palpite
+colors = [RED, GREEN, BLUE, YELLOW, ORANGE, BLACK, WHITE]
+
+cores_corretas = []
+
+
+indice_cores = 0
+
+def player(guess_hist, res_hist):
+    """
+    Função principal do jogador.
+
+    Esta função deve retornar o seu palpite, que deve ser uma lista de 4 cores.
+    As cores disponíveis são: RED, GREEN, BLUE, YELLOW, ORANGE, BLACK, WHITE.
+
+    Parâmetros:
+    - guess_hist: lista de palpites anteriores
+    - res_hist: lista de resultados anteriores
+
+    Retorna:
+    - lista de 4 cores
+
+    Exemplo:
+    return [RED, GREEN, BLUE, YELLOW]
+    """
+    global indice_cores
+
+    anterior = []
+    ultimo_result = []
+    penultimo_result = []
+
+    if len(guess_hist) > 0:
+        anterior = guess_hist[-1]
+        ultimo_result = res_hist[-1]
+    
+    palpite = anterior.copy()
+
+    if len(guess_hist) > 1:
+        penultimo_result = res_hist[-2]
+
+        diff_x = ultimo_result[0] - penultimo_result[0]
+
+        if diff_x == 1:
+            cores_corretas.append(colors[indice_cores + 4])
+        elif diff_x == -1:
+            cores_corretas.append(colors[indice_cores])
+
+
+
+    #fazendo a nova tentativa
+
+    if len(guess_hist) == 0:
+        palpite = [RED, GREEN, BLUE, YELLOW]
+    
+    else:
+        if ultimo_result[0] < 4 and indice_cores + 4 < len(colors):
+            palpite[indice_cores] = colors[indice_cores + 4]
+            indice_cores += 1
+    print(cores_corretas)
+
+
+    
+    return palpite
