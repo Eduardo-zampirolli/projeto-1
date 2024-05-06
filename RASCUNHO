@@ -1,9 +1,12 @@
-    informacoes ={
-        RED: [2,[0,1,2,3]],
-        GREEN: [2,[0,1,2,3]],
-        BLUE: [2,[0,1,2,3]],
-        YELLOW: [2,[0,1,2,3]],
-        ORANGE: [2,[0,1,2,3]],
-        BLACK: [2,[0,1,2,3]],
-        WHITE: [2,[0,1,2,3]],
+informacoes ={
+    RED: [2,[0,1,2,3]],
+    GREEN: [2,[0,1,2,3]],
+    BLUE: [2,[0,1,2,3]],
+    YELLOW: [2,[0,1,2,3]],
+    ORANGE: [2,[0,1,2,3]],
+    BLACK: [2,[0,1,2,3]],
+    WHITE: [2,[0,1,2,3]],
     }
+def troca(posicao1,posicao2):
+
+def permutacao
