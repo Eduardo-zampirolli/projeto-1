@@ -246,9 +246,11 @@ def player(guess_hist, res_hist):
                         #dic_cores[guess_hist[-1][pares_trocas[-1][i]]].remove(pares_trocas[-1][i])
                         
 
-                    if len(pares_trocas) > 1 and pares_trocas[-2][i] in dic_cores[guess_hist[-2][pares_trocas[-2][i]]]:
+                    if type(dic_cores[guess_hist[-2][pares_trocas[-1][(i+1)%2]]]) == list and pares_trocas[-1][(i+1)%2] in dic_cores[guess_hist[-2][pares_trocas[-1][(i+1)%2]]]:
+                        remover(guess_hist[-2][pares_trocas[-1][(i+1)%2]], pares_trocas[-1][(i+1)%2])
+                    '''if type(dic_cores[guess_hist[-2][pares_trocas[-2][i]]]) == list and len(pares_trocas) > 1 and pares_trocas[-2][i] in dic_cores[guess_hist[-2][pares_trocas[-2][i]]]:
                         remover(guess_hist[-2][pares_trocas[-2][i]], pares_trocas[-2][i])
-                        #dic_cores[guess_hist[-2][pares_trocas[-2][i]]].remove(pares_trocas[-2][i])
+                        #dic_cores[guess_hist[-2][pares_trocas[-2][i]]].remove(pares_trocas[-2][i])'''
                         
 
             
@@ -292,7 +294,7 @@ def player(guess_hist, res_hist):
             if type(copia_dic[i]) == int and i in cores_certas:
                 for k in copia_dic:
                     if type(copia_dic[k]) == list and copia_dic[i] in copia_dic[k]:
-                        remover(dic_cores[k],copia_dic[i])
+                        remover(k,copia_dic[i])
                         '''dic_cores[k].remove(copia_dic[i])
                         if len(dic_cores[k]) == 1:
                             dic_cores[k] = dic_cores[k].pop()'''
@@ -341,11 +343,12 @@ def player(guess_hist, res_hist):
             for i in range(4):
                 if type(dic_cores[guess_hist[-1][i]]) == list and i not in dic_cores[guess_hist[-1][i]] and len(dic_cores[guess_hist[-1][i]]) > 0:
                     #Verificando se a cor se encontra em uma posição que ela não pode estar
-                    return permutacao(guess_hist[-1],i,dic_cores[guess_hist[-1][i]][-1])
+                    #if i in dic_cores[guess_hist[-1][dic_cores[guess_hist[-1][i]][-1]]]:
+                        return permutacao(guess_hist[-1],i,dic_cores[guess_hist[-1][i]][-1])
             for i in range(4):
                 if type(dic_cores[guess_hist[-1][i]]) == list and type(dic_cores[guess_hist[-1][dic_cores[guess_hist[-1][i]][-1]]]) == list:
                     if i in dic_cores[guess_hist[-1][i]]:
-                        if i != dic_cores[guess_hist[-1][i]][-1]:
+                        if i != dic_cores[guess_hist[-1][i]][-1] and i in dic_cores[guess_hist[-1][dic_cores[guess_hist[-1][i]][-1]]]:
                             return permutacao(guess_hist[-1],i,dic_cores[guess_hist[-1][i]][-1])
                         else:
                             return permutacao(guess_hist[-1],i,dic_cores[guess_hist[-1][i]][-2])
