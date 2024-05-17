@@ -17,9 +17,6 @@ from random import sample
 colors = [RED, GREEN, BLUE, YELLOW, ORANGE, BLACK, WHITE]
 cores_adicionais = [ORANGE, BLACK, WHITE]
 
-cor_tirada = 0
-cor_colocada = 0
-
 cores_certas = []
 cores_erradas = []
 cores_poss = []
@@ -70,8 +67,6 @@ def player(guess_hist, res_hist):
 
     global indice_subst
     global indice_cadicional
-    global cor_tirada
-    global cor_colocada
 
     global cores_erradas
     global cores_certas
@@ -114,29 +109,23 @@ def player(guess_hist, res_hist):
         if res_hist[-1][0] != 4 and len(cores_certas) < 4: #se for 4 então não é necessario seguir em frente
 
             if len(guess_hist) == 1:
-                cor_tirada = colors[indice_subst]
-                cor_colocada = cores_adicionais[indice_cadicional]
-
                 palpite[indice_subst] = cores_adicionais[indice_cadicional]
 
             else:
                 diff = res_hist[-1][0] - quantidade_certa
-
+                palpite_anterior = guess_hist[-2]
                 if diff == 0:
                     acao = 0
-
                 elif diff == -1:
                     acao = -1
-
                 else:
                     acao = 1
-
                 if acao == 0:
 
-                    cores_poss.append(cor_tirada)
+                    cores_poss.append(palpite_anterior[indice_subst])
 
-                    if cor_colocada not in cores_poss:
-                        cores_poss.append(cor_colocada)
+                    if palpite[indice_subst] not in cores_poss:
+                        cores_poss.append(palpite[indice_subst])
 
                     indice_subst += 1
 
@@ -152,34 +141,23 @@ def player(guess_hist, res_hist):
                         cores_certas += cores_poss
                         cores_poss = []
                         palpite = cores_certas
-
                     elif len(cores_poss) + len(cores_certas) > 4:
                         cores_erradas += cores_poss
                         cores_certas = []
-
                         for cor in colors:
                             if cor not in cores_erradas:
                                 cores_certas.append(cor)
-                                
                         palpite = cores_certas
-                        
                     else:
-                        palpite = achar_substituir(palpite, cor_tirada, cor_colocada)
-
-                        cor_tirada = colors[indice_subst]
-                        cor_colocada = cores_adicionais[indice_cadicional]
-
-                        palpite = achar_substituir(palpite, cor_colocada, cor_tirada)
+                        palpite[indice_subst] = cores_adicionais[indice_cadicional]
+                        palpite[indice_subst - 1] = palpite_anterior[indice_subst - 1]
 
                 elif acao == -1:
-
                     cores_erradas += cores_poss #cores erradas que haviam sido colocadas para avaliação quando diff == 0
                     cores_poss = []
-                    cores_certas.append(cor_tirada)
-
-                    if cor_colocada not in cores_erradas: #cor errada sem que antes tenha tido diff == 0
-                        cores_erradas.append(cor_colocada) 
-
+                    cores_certas.append(palpite_anterior[indice_subst])
+                    if palpite[indice_subst] not in cores_erradas: #cor errada sem que antes tenha tido diff == 0
+                        cores_erradas.append(palpite[indice_subst]) 
                     indice_subst += 1
                     indice_cadicional += 1
                     
@@ -191,44 +169,29 @@ def player(guess_hist, res_hist):
                         palpite = cores_certas
                     
                     else:
-
-                        palpite = achar_substituir(palpite, cor_tirada, cor_colocada) #cor tirada estava correta
-
-                        cor_tirada = colors[indice_subst]
-                        cor_colocada = cores_adicionais[indice_cadicional]
-
-                        palpite = achar_substituir(palpite, cor_colocada, cor_tirada)
-
+                        palpite[indice_subst] = cores_adicionais[indice_cadicional]
+                        palpite[indice_subst - 1] = palpite_anterior[indice_subst - 1]
                 elif acao == 1:
-
                     cores_certas += cores_poss
                     cores_poss = []
-                    
-                    cores_erradas.append(cor_tirada)
 
-                    if cor_colocada not in cores_certas:
-                        cores_certas.append(cor_colocada)
+                    cores_erradas.append(palpite_anterior[indice_subst])
+                    if not guess_hist[-1][indice_subst] in cores_certas:
+                        cores_certas.append(guess_hist[-1][indice_subst])
                         
                     indice_subst += 1
                     indice_cadicional += 1
-
-                    if len(cores_erradas) == 3:      
-
+                    if len(cores_erradas) == 3:                        
                         cores_certas = []
                         for cor in colors:
                             if cor not in cores_erradas:
                                 cores_certas.append(cor)
                         palpite = cores_certas
-
                     elif len(cores_certas) == 4:
                         palpite = cores_certas
-
                     else:
-                        cor_tirada = colors[indice_subst]
-                        cor_colocada = cores_adicionais[indice_cadicional]
-
-                        palpite = achar_substituir(palpite, cor_colocada, cor_tirada)
-
+                        palpite[indice_subst] = cores_adicionais[indice_cadicional]
+                        palpite[indice_subst - 1] = guess_hist[-1][indice_subst - 1]
 
         if res_hist[-1][0] > quantidade_certa:
             quantidade_certa = res_hist[-1][0]
@@ -257,11 +220,13 @@ def player(guess_hist, res_hist):
         
         if len(res_hist) > 1 and res_hist[-2][0] == 4:           
             if dif_pos[-1] == 2:
-                #Se aumentarem as posições corretas em 2, devemos trocas o par não permutado da última tentativa
-                for i in range(2):
-                    dic_cores[guess_hist[-1][pares_trocas[-1][i]]] = pares_trocas[-1][i]
-                        
-                    dic_cores[guess_hist[-1][pares_n_trocas[-1][i]]] = pares_n_trocas[-1][(i+1)%2]
+                #Verificar se houve apenas uma permutação
+                if guess_hist[-1][pares_n_trocas[-1][0]] == guess_hist[-2][pares_n_trocas[-1][0]] and guess_hist[-1][pares_n_trocas[-1][1]] == guess_hist[-2][pares_n_trocas[-1][1]]:
+                    #Se aumentarem as posições corretas em 2, devemos trocas o par não permutado da última tentativa
+                    for i in range(2):
+                        dic_cores[guess_hist[-1][pares_trocas[-1][i]]] = pares_trocas[-1][i]
+                            
+                        dic_cores[guess_hist[-1][pares_n_trocas[-1][i]]] = pares_n_trocas[-1][(i+1)%2]
                 
             
             
@@ -292,14 +257,18 @@ def player(guess_hist, res_hist):
                     for i in range(2):
                         if type(dic_cores[guess_hist[-2][pares_trocas[-1][i]]]) == list and pares_trocas[-1][i] in dic_cores[guess_hist[-2][pares_trocas[-1][i]]]:
                             dic_cores[guess_hist[-2][pares_trocas[-1][i]]].remove(pares_trocas[-1][i])
-                            
+                        
                 
                                 #TOMAR CUIDADO COM O PAR TROCA, É PRECISO VERIFICAR SE ELE ESTÁ SE REFERINDO PARA A COR DESEJADA, ACHAR OUTRO MÉTODO DE VERIFICAÇÃO
             else:
                 #Se houve um aumento da posição, ambas as cores estavam em posições erradas no último palpite
                 for i in range(2):
-                    if type(dic_cores[cores_certas[pares_trocas[-1][i]]]) == list and pares_trocas[-1][i] in dic_cores[cores_certas[pares_trocas[-1][i]]]:
-                        dic_cores[guess_hist[-1][pares_trocas[-1][i]]].remove(pares_trocas[-1][i])
+                    if type(dic_cores[cores_certas[pares_trocas[-1][i]]]) == list:
+                        if pares_trocas[-1][i] in dic_cores[cores_certas[pares_trocas[-1][i]]]:
+                            dic_cores[guess_hist[-1][pares_trocas[-1][i]]].remove(pares_trocas[-1][i])
+                        #Caso uma das cores não estivesse em uma posição possível antes da troca, a outra cor que foi trocada estava na posição correta
+                        if type(dic_cores[guess_hist[-2][pares_trocas[-1][i]]]) == list and pares_trocas[-1][i] not in dic_cores[guess_hist[-2][pares_trocas[-1][i]]]:
+                            dic_cores[guess_hist[-2][pares_trocas[-1][(i+1)%2]]] = pares_trocas[-1][(i+1)%2]
 
                         
                 
@@ -312,12 +281,23 @@ def player(guess_hist, res_hist):
             if type(dic_cores[cor]) == list and len(dic_cores[cor]) == 1:
             #Transformando a lista unitária em inteiro
                 dic_cores[cor] = (dic_cores[cor]).pop()
+        #Retirando as posicoes ja encontradas:
+        copia_dic = dic_cores.copy()
+    
+        for i in copia_dic:
+            if type(copia_dic[i]) == int and i in cores_certas:
+                for k in copia_dic:
+                    if type(copia_dic[k]) == list and copia_dic[i] in copia_dic[k]:
+                        dic_cores[k].remove(copia_dic[i])
+                        if len(dic_cores[k]) == 1:
+                            dic_cores[k] = dic_cores[k].pop()
         #Colocando as cores em suas posições já encontradas
         contador = 0
         #Criar uma cópia das cores certas para poder manipular a original para preservar a sequência
         copia_cores = cores_certas.copy()
         while contador < 4:
-            if contador != dic_cores[copia_cores[contador]]:
+            if contador != dic_cores[cores_certas[contador]]:
+
                 if type(dic_cores[copia_cores[contador]]) == int:
                     #Realizando a troca entre uma cor com posição encontrada e outra cuja posição é desconhecida
                     if type(dic_cores[cores_certas[dic_cores[cores_certas[contador]]]]) == list:           
@@ -356,7 +336,7 @@ def player(guess_hist, res_hist):
                     #Verificando se a cor se encontra em uma posição que ela não pode estar
                     return permutacao(guess_hist[-1],i,dic_cores[guess_hist[-1][i]][-1])
             for i in range(4):
-                if type(dic_cores[guess_hist[-1][i]]) == list and type(dic_cores[guess_hist[-1][dic_cores[guess_hist[-1][i]][0]]]) == list:
+                if type(dic_cores[guess_hist[-1][i]]) == list and type(dic_cores[guess_hist[-1][dic_cores[guess_hist[-1][i]][-1]]]) == list:
                     if i in dic_cores[guess_hist[-1][i]]:
                         if i != dic_cores[guess_hist[-1][i]][-1]:
                             return permutacao(guess_hist[-1],i,dic_cores[guess_hist[-1][i]][-1])
@@ -364,87 +344,7 @@ def player(guess_hist, res_hist):
                             return permutacao(guess_hist[-1],i,dic_cores[guess_hist[-1][i]][-2])
 
             
-        
-        
-            
-            
-
-        '''if len(res_hist) ==1 or res_hist[-2][0] < 4:
-        #Levar em consideracao as posicoes ja encontradas
-            for k in cores_certas:
-                if type(dic_cores[k]) == int and dic_cores[k] not in pos_corretas:
-                    pos_corretas.append(dic_cores[k])
-            #Colocando apenas os elementos nao encontrados como posicoes restantes
-            #for j in pos_restantes:
-            #    if j in pos_corretas:
-            #       pos_restantes.remove(j)
-            #Permutacao entre elementos das posicoes restantes
-            for i in range(4):
-                if i not in pos_corretas:
-                    pos_restantes.append(i)
-            if len(pos_restantes) >1:
-                return permutacao(palpite, pos_restantes[0], pos_restantes[1])
-            else:
-                return permutacao(palpite, 0, 2)
-        
-        else:
-            if dif_pos[-1] == 2:
-                #Se aumentarem as posições corretas em 2, devemos trocas o par não permutado da última tentativa
-                for i in range(2):
-                    dic_cores[guess_hist[-1][pares_trocas[-1][i]]] = pares_trocas[-1][i]
-                    
-                    dic_cores[guess_hist[-1][pares_n_trocas[-1][i]]] = pares_n_trocas[-1][i]
-                #return permutacao(guess_hist[-1], pares_n_trocas[-1][0], pares_n_trocas[-1][1])
-
-            
-            elif dif_pos[-1] == -2:
-                #Se diminuírem as posições corretas em 2, devemos trocas o par não permutado da penúltima tentativa
-                for i in range(2):
-                    dic_cores[guess_hist[-2][pares_trocas[-2][i]]] = pares_trocas[-2][i]
-                    #return permutacao(guess_hist[-2], pares_n_trocas[-1][0], pares_n_trocas[-1][1])
-            
-            #Caso a diferença entre as posições não tenha se alterado, ambas as cores trocadas estão em posições erradas, no último e no penúltimo palpite
-            elif dif_pos[-1] == 0:
-                #Retirando as posições nas quais as cores estão erradas
-                for i in range(2):
-                    dic_cores[guess_hist[-1][pares_trocas[-1][i]]].remove(pares_trocas[-1][i])
-                    if len(dic_cores[guess_hist[-1][pares_trocas[-1][i]]]) == 1:
-                        dic_cores[guess_hist[-1][pares_trocas[-1][i]]] = int(dic_cores[guess_hist[-1][pares_trocas[-1][i]]])
-                    dic_cores[guess_hist[-2][pares_trocas[-2][i]]].remove(pares_trocas[-2][i])
-                    if len(dic_cores[guess_hist[-2][pares_trocas[-2][i]]]) == 1:
-                        dic_cores[guess_hist[-2][pares_trocas[-2][i]]] = int(dic_cores[guess_hist[-2][pares_trocas[-2][i]]])
-
-                if dif_pos[-2] != 0:
-                    #return permutacao(guess_hist[-1],pares_trocas[-1][0],pares_n_trocas[-1][0])
-                    
-                elif len(pares_trocas) > 1:
-                    troca1 = permutacao(guess_hist[-2],pares_trocas[-2][0],pares_n_trocas[-2][1])
-                    return permutacao(troca1,pares_n_trocas[-1][0],pares_n_trocas[-1][1])
-                else:
-                    return permutacao(guess_hist[-2], pares_trocas[-1][0], pares_n_trocas[-1][0])
-            
-            
-            elif dif_pos[-1] == 1:
-                #Se houve um aumento da posição, ambas as cores estavam em posições erradas no penúltimo palpite
-                for i in range(2):
-                    dic_cores[guess_hist[-2][pares_trocas[-2][i]]].remove(pares_trocas[-2][i])
-                    if len(dic_cores[guess_hist[-2][pares_trocas[-2][i]]]) == 1:
-                        dic_cores[guess_hist[-2][pares_trocas[-2][i]]] = int(dic_cores[guess_hist[-2][pares_trocas[-2][i]]])
-                #return permutacao(guess_hist[-1],pares_trocas[-1][1],pares_n_trocas[-1][0])
-            else:
-                #Se houve um aumento da posição, ambas as cores estavam em posições erradas no último palpite
-                for i in range(2):
-                    dic_cores[guess_hist[-1][pares_trocas[-1][i]]].remove(pares_trocas[-1][i])
-                    if len(dic_cores[guess_hist[-1][pares_trocas[-1][i]]]) == 1:
-                        dic_cores[guess_hist[-1][pares_trocas[-1][i]]] = int(dic_cores[guess_hist[-1][pares_trocas[-1][i]]])
-                #if len(pares_trocas) < 2 or dif_pos[-2] != -1 or dif_pos[-2] != 1:
-                    return permutacao(guess_hist[-1],pares_trocas[-1][1],pares_n_trocas[-1][0])
-                else:
-                    return permutacao(guess_hist[-2],pares_trocas[-2][0],pares_n_trocas[-2][0])'''
-                #Caso a diferença for -1
-            
-            
-        #Criando uma estratégia para trocar apenas as posições nas quais a cor pode estar  
+  
             
            
 
@@ -514,6 +414,8 @@ def analise(lista, situacao=[[0,0]], parametro1=0, parametro2=0):
                 dic_cores[cor_nova] = (indice_da_cor(lista[-1],cor_nova))
             elif parametro1 <= 0 and parametro2 < 0:
                 dic_cores[cor_velha] = (indice_da_cor(lista[-2],cor_velha))
+            elif parametro1 == 1 and parametro2 == 0 and indice_da_cor(lista[-1],cor_nova) in dic_cores[cor_nova]:
+                dic_cores[cor_nova].remove(indice_da_cor(lista[-1],cor_nova))
 
     
     #Retirando as posicoes ja encontradas:
@@ -524,18 +426,6 @@ def analise(lista, situacao=[[0,0]], parametro1=0, parametro2=0):
             for k in copia_dic:
                 if type(copia_dic[k]) == list and copia_dic[i] in copia_dic[k]:
                     dic_cores[k].remove(copia_dic[i])
-
-def achar_substituir(lista, novo_item, velho_item):
-
-    '''Recebe um lista e troca todos os elementos dela de valor <velho_item> pelo valor <novo_item>, e retorna essa lista'''
-
-    for i in range(len(lista)):
-        if lista[i] == velho_item:         
-            lista[i] = novo_item
-        
-    return lista
-
-
 '''
 A análise deve ver as posições possíveis e guardar depois verificar se a a cor correta 
 Armazenar as posições das cores quando houver alguma posição correta em qualquer momento do código
