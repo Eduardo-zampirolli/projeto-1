@@ -352,7 +352,8 @@ def player(guess_hist, res_hist):
                             return permutacao(guess_hist[-1],i,dic_cores[guess_hist[-1][i]][-1])
                         else:
                             return permutacao(guess_hist[-1],i,dic_cores[guess_hist[-1][i]][-2])
-
+                
+            return permutacao(guess_hist[-1],i,(i+1)%2)
             
   
             
