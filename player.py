@@ -87,7 +87,7 @@ def player(guess_hist, res_hist):
         dif_pos.append(res_hist[-1][1] - res_hist[-2][1])
         #Diferenca entre os valores das cores
         dif_cor.append(res_hist[-1][0] - res_hist[-2][0])
-        analise(guess_hist, res_hist, dif_cor[-1], dif_pos[-1])
+        analise(guess_hist, res_hist, dif_cor[-1], dif_pos[-1]) #INTEGRAR
     #fazendo a nova tentativa
 
     if len(guess_hist) == 0: #caso inicial
@@ -241,12 +241,14 @@ def player(guess_hist, res_hist):
             elif dif_pos[-1] == 0:
                 #Retirando as posições nas quais as cores estão erradas
                 for i in range(2):
-                    if pares_trocas[-1][i] in dic_cores[cores_certas[pares_trocas[-1][i]]]:
-                        dic_cores[guess_hist[-1][pares_trocas[-1][i]]].remove(pares_trocas[-1][i])
+                    if type(dic_cores[cores_certas[pares_trocas[-1][i]]]) == list and pares_trocas[-1][i] in dic_cores[cores_certas[pares_trocas[-1][i]]]:
+                        remover(guess_hist[-1][pares_trocas[-1][i]], pares_trocas[-1][i])
+                        #dic_cores[guess_hist[-1][pares_trocas[-1][i]]].remove(pares_trocas[-1][i])
                         
 
                     if len(pares_trocas) > 1 and pares_trocas[-2][i] in dic_cores[guess_hist[-2][pares_trocas[-2][i]]]:
-                        dic_cores[guess_hist[-2][pares_trocas[-2][i]]].remove(pares_trocas[-2][i])
+                        remover(guess_hist[-2][pares_trocas[-2][i]], pares_trocas[-2][i])
+                        #dic_cores[guess_hist[-2][pares_trocas[-2][i]]].remove(pares_trocas[-2][i])
                         
 
             
@@ -256,7 +258,8 @@ def player(guess_hist, res_hist):
                 if len(pares_trocas) > 0:
                     for i in range(2):
                         if type(dic_cores[guess_hist[-2][pares_trocas[-1][i]]]) == list and pares_trocas[-1][i] in dic_cores[guess_hist[-2][pares_trocas[-1][i]]]:
-                            dic_cores[guess_hist[-2][pares_trocas[-1][i]]].remove(pares_trocas[-1][i])
+                            remover(guess_hist[-2][pares_trocas[-1][i]], pares_trocas[-1][i])
+                            #dic_cores[guess_hist[-2][pares_trocas[-1][i]]].remove(pares_trocas[-1][i])
                         
                 
                                 #TOMAR CUIDADO COM O PAR TROCA, É PRECISO VERIFICAR SE ELE ESTÁ SE REFERINDO PARA A COR DESEJADA, ACHAR OUTRO MÉTODO DE VERIFICAÇÃO
@@ -265,7 +268,8 @@ def player(guess_hist, res_hist):
                 for i in range(2):
                     if type(dic_cores[cores_certas[pares_trocas[-1][i]]]) == list:
                         if pares_trocas[-1][i] in dic_cores[cores_certas[pares_trocas[-1][i]]]:
-                            dic_cores[guess_hist[-1][pares_trocas[-1][i]]].remove(pares_trocas[-1][i])
+                            remover(guess_hist[-1][pares_trocas[-1][i]], pares_trocas[-1][i])
+                            #dic_cores[guess_hist[-1][pares_trocas[-1][i]]].remove(pares_trocas[-1][i])
                         #Caso uma das cores não estivesse em uma posição possível antes da troca, a outra cor que foi trocada estava na posição correta
                         if type(dic_cores[guess_hist[-2][pares_trocas[-1][i]]]) == list and pares_trocas[-1][i] not in dic_cores[guess_hist[-2][pares_trocas[-1][i]]]:
                             dic_cores[guess_hist[-2][pares_trocas[-1][(i+1)%2]]] = pares_trocas[-1][(i+1)%2]
@@ -276,11 +280,11 @@ def player(guess_hist, res_hist):
 
 
 
-        #Caso só haja uma possição possível para uma cor transformar para inteiro
+        '''#Caso só haja uma possição possível para uma cor transformar para inteiro
         for cor in cores_certas:
             if type(dic_cores[cor]) == list and len(dic_cores[cor]) == 1:
             #Transformando a lista unitária em inteiro
-                dic_cores[cor] = (dic_cores[cor]).pop()
+                dic_cores[cor] = (dic_cores[cor]).pop()'''
         #Retirando as posicoes ja encontradas:
         copia_dic = dic_cores.copy()
     
@@ -288,9 +292,10 @@ def player(guess_hist, res_hist):
             if type(copia_dic[i]) == int and i in cores_certas:
                 for k in copia_dic:
                     if type(copia_dic[k]) == list and copia_dic[i] in copia_dic[k]:
-                        dic_cores[k].remove(copia_dic[i])
+                        remover(dic_cores[k],copia_dic[i])
+                        '''dic_cores[k].remove(copia_dic[i])
                         if len(dic_cores[k]) == 1:
-                            dic_cores[k] = dic_cores[k].pop()
+                            dic_cores[k] = dic_cores[k].pop()'''
         #Colocando as cores em suas posições já encontradas
         contador = 0
         #Criar uma cópia das cores certas para poder manipular a original para preservar a sequência
@@ -305,17 +310,19 @@ def player(guess_hist, res_hist):
                         #Removendo a posição da cor cujo valor no dicionário é representado como lista, já que a cor na qual ela está já está direcionada para outra cor
                         #O índice 
                         if pares_trocas[-1][1] in dic_cores[cores_certas[pares_trocas[-1][0]]]:
-                            dic_cores[cores_certas[pares_trocas[-1][0]]].remove(pares_trocas[-1][1])
+                            remover(cores_certas[pares_trocas[-1][0]], pares_trocas[-1][1])
+                            '''dic_cores[cores_certas[pares_trocas[-1][0]]].remove(pares_trocas[-1][1])
                             #Caso apenas uma posição seja possível para a cor, transforme a lista em inteiro
                             if len(dic_cores[cores_certas[pares_trocas[-1][0]]]) == 1:
-                                dic_cores[cores_certas[pares_trocas[-1][0]]] = (dic_cores[cores_certas[pares_trocas[-1][0]]]).pop()
+                                dic_cores[cores_certas[pares_trocas[-1][0]]] = (dic_cores[cores_certas[pares_trocas[-1][0]]]).pop()'''
                             
                     else:
                         cores_certas = permutacao(cores_certas, (dic_cores[cores_certas[dic_cores[cores_certas[contador]]]]), dic_cores[cores_certas[contador]])
                         if type(dic_cores[cores_certas[pares_trocas[-1][0]]]) == list and pares_trocas[-1][0] in dic_cores[cores_certas[pares_trocas[-1][0]]]:
-                            dic_cores[cores_certas[pares_trocas[-1][0]]].remove(pares_trocas[-1][0])
+                            remover(cores_certas[pares_trocas[-1][0]], pares_trocas[-1][0])
+                            '''dic_cores[cores_certas[pares_trocas[-1][0]]].remove(pares_trocas[-1][0])
                             if len(dic_cores[cores_certas[pares_trocas[-1][0]]]) == 1:
-                                dic_cores[cores_certas[pares_trocas[-1][0]]] = (dic_cores[cores_certas[pares_trocas[-1][0]]]).pop()
+                                dic_cores[cores_certas[pares_trocas[-1][0]]] = (dic_cores[cores_certas[pares_trocas[-1][0]]]).pop()'''
                                 
                         contador -= 1
             contador += 1
@@ -374,6 +381,8 @@ def indice_da_cor(lista_de_cores,cor):
     for i in range(len(lista_de_cores)):
         if lista_de_cores[i] == cor:
             return i
+        
+
             
 def analise(lista, situacao=[[0,0]], parametro1=0, parametro2=0):
     '''
@@ -403,7 +412,8 @@ def analise(lista, situacao=[[0,0]], parametro1=0, parametro2=0):
             #Loop que vai remover todas as cores da listas de posicoes possiveis de uma determinada cor, caso a posicao original ainda nao tenha sido encontrada
             for i in range(4):
                 if type(dic_cores[lista[-1][i]]) == list and i in dic_cores[lista[-1][i]]:
-                    dic_cores[lista[-1][i]].remove(i)
+                    remover(lista[-1][i], i)
+                    #dic_cores[lista[-1][i]].remove(i)
 
     
         #Caso haja mudança de cor sem haver mudança de posição das demais cores
@@ -415,7 +425,8 @@ def analise(lista, situacao=[[0,0]], parametro1=0, parametro2=0):
             elif parametro1 <= 0 and parametro2 < 0:
                 dic_cores[cor_velha] = (indice_da_cor(lista[-2],cor_velha))
             elif parametro1 == 1 and parametro2 == 0 and indice_da_cor(lista[-1],cor_nova) in dic_cores[cor_nova]:
-                dic_cores[cor_nova].remove(indice_da_cor(lista[-1],cor_nova))
+                remover(cor_nova, indice_da_cor(lista[-1],cor_nova))
+                #dic_cores[cor_nova].remove(indice_da_cor(lista[-1],cor_nova))
 
     
     #Retirando as posicoes ja encontradas:
@@ -425,7 +436,8 @@ def analise(lista, situacao=[[0,0]], parametro1=0, parametro2=0):
         if type(copia_dic[i]) == int and i in cores_certas:
             for k in copia_dic:
                 if type(copia_dic[k]) == list and copia_dic[i] in copia_dic[k]:
-                    dic_cores[k].remove(copia_dic[i])
+                    remover(k, copia_dic[i])
+                    #dic_cores[k].remove(copia_dic[i])
 '''
 A análise deve ver as posições possíveis e guardar depois verificar se a a cor correta 
 Armazenar as posições das cores quando houver alguma posição correta em qualquer momento do código
@@ -434,3 +446,9 @@ parametro2 = diferença das posições
 lista = histórico de sequencia de cores
 situacao = acerto das cores e posições
 '''
+def remover(cor,indice):
+    '''Remove determinado índice na lista de posições possíveis de uma cor e a transforma para inteiro se for uma lista unitária'''
+    global dic_cores
+    dic_cores[cor].remove(indice)
+    if len(dic_cores[cor]) == 1:
+        dic_cores[cor] = dic_cores[cor].pop()
