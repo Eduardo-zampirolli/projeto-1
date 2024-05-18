@@ -17,6 +17,9 @@ from random import sample
 colors = [RED, GREEN, BLUE, YELLOW, ORANGE, BLACK, WHITE]
 cores_adicionais = [ORANGE, BLACK, WHITE]
 
+cor_tirada = 0
+cor_colocada = 0
+
 cores_certas = []
 cores_erradas = []
 cores_poss = []
@@ -67,6 +70,8 @@ def player(guess_hist, res_hist):
 
     global indice_subst
     global indice_cadicional
+    global cor_tirada
+    global cor_colocada
 
     global cores_erradas
     global cores_certas
@@ -109,23 +114,29 @@ def player(guess_hist, res_hist):
         if res_hist[-1][0] != 4 and len(cores_certas) < 4: #se for 4 então não é necessario seguir em frente
 
             if len(guess_hist) == 1:
+                cor_tirada = colors[indice_subst]
+                cor_colocada = cores_adicionais[indice_cadicional]
+
                 palpite[indice_subst] = cores_adicionais[indice_cadicional]
 
             else:
                 diff = res_hist[-1][0] - quantidade_certa
-                palpite_anterior = guess_hist[-2]
+
                 if diff == 0:
                     acao = 0
+
                 elif diff == -1:
                     acao = -1
+
                 else:
                     acao = 1
+
                 if acao == 0:
 
-                    cores_poss.append(palpite_anterior[indice_subst])
+                    cores_poss.append(cor_tirada)
 
-                    if palpite[indice_subst] not in cores_poss:
-                        cores_poss.append(palpite[indice_subst])
+                    if cor_colocada not in cores_poss:
+                        cores_poss.append(cor_colocada)
 
                     indice_subst += 1
 
@@ -141,23 +152,34 @@ def player(guess_hist, res_hist):
                         cores_certas += cores_poss
                         cores_poss = []
                         palpite = cores_certas
+
                     elif len(cores_poss) + len(cores_certas) > 4:
                         cores_erradas += cores_poss
                         cores_certas = []
+
                         for cor in colors:
                             if cor not in cores_erradas:
                                 cores_certas.append(cor)
+                                
                         palpite = cores_certas
+                        
                     else:
-                        palpite[indice_subst] = cores_adicionais[indice_cadicional]
-                        palpite[indice_subst - 1] = palpite_anterior[indice_subst - 1]
+                        palpite = achar_substituir(palpite, cor_tirada, cor_colocada)
+
+                        cor_tirada = colors[indice_subst]
+                        cor_colocada = cores_adicionais[indice_cadicional]
+
+                        palpite = achar_substituir(palpite, cor_colocada, cor_tirada)
 
                 elif acao == -1:
+
                     cores_erradas += cores_poss #cores erradas que haviam sido colocadas para avaliação quando diff == 0
                     cores_poss = []
-                    cores_certas.append(palpite_anterior[indice_subst])
-                    if palpite[indice_subst] not in cores_erradas: #cor errada sem que antes tenha tido diff == 0
-                        cores_erradas.append(palpite[indice_subst]) 
+                    cores_certas.append(cor_tirada)
+
+                    if cor_colocada not in cores_erradas: #cor errada sem que antes tenha tido diff == 0
+                        cores_erradas.append(cor_colocada) 
+
                     indice_subst += 1
                     indice_cadicional += 1
                     
@@ -169,29 +191,43 @@ def player(guess_hist, res_hist):
                         palpite = cores_certas
                     
                     else:
-                        palpite[indice_subst] = cores_adicionais[indice_cadicional]
-                        palpite[indice_subst - 1] = palpite_anterior[indice_subst - 1]
+
+                        palpite = achar_substituir(palpite, cor_tirada, cor_colocada) #cor tirada estava correta
+
+                        cor_tirada = colors[indice_subst]
+                        cor_colocada = cores_adicionais[indice_cadicional]
+
+                        palpite = achar_substituir(palpite, cor_colocada, cor_tirada)
+
                 elif acao == 1:
+
                     cores_certas += cores_poss
                     cores_poss = []
+                    
+                    cores_erradas.append(cor_tirada)
 
-                    cores_erradas.append(palpite_anterior[indice_subst])
-                    if not guess_hist[-1][indice_subst] in cores_certas:
-                        cores_certas.append(guess_hist[-1][indice_subst])
+                    if cor_colocada not in cores_certas:
+                        cores_certas.append(cor_colocada)
                         
                     indice_subst += 1
                     indice_cadicional += 1
-                    if len(cores_erradas) == 3:                        
+
+                    if len(cores_erradas) == 3:      
+
                         cores_certas = []
                         for cor in colors:
                             if cor not in cores_erradas:
                                 cores_certas.append(cor)
                         palpite = cores_certas
+
                     elif len(cores_certas) == 4:
                         palpite = cores_certas
+
                     else:
-                        palpite[indice_subst] = cores_adicionais[indice_cadicional]
-                        palpite[indice_subst - 1] = guess_hist[-1][indice_subst - 1]
+                        cor_tirada = colors[indice_subst]
+                        cor_colocada = cores_adicionais[indice_cadicional]
+
+                        palpite = achar_substituir(palpite, cor_colocada, cor_tirada)
 
         if res_hist[-1][0] > quantidade_certa:
             quantidade_certa = res_hist[-1][0]
@@ -456,3 +492,14 @@ def remover(cor,indice):
     dic_cores[cor].remove(indice)
     if len(dic_cores[cor]) == 1:
         dic_cores[cor] = dic_cores[cor].pop()
+
+
+def achar_substituir(lista, novo_item, velho_item):
+
+    '''Recebe um lista e troca todos os elementos dela de valor <velho_item> pelo valor <novo_item>, e retorna essa lista'''
+
+    for i in range(len(lista)):
+        if lista[i] == velho_item:         
+            lista[i] = novo_item
+        
+    return lista
