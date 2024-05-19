@@ -117,7 +117,7 @@ def player(guess_hist, res_hist):
                 cor_tirada = colors[indice_subst]
                 cor_colocada = cores_adicionais[indice_cadicional]
 
-                palpite[indice_subst] = cores_adicionais[indice_cadicional]
+                palpite = achar_substituir(palpite, cor_colocada, cor_tirada)
 
             else:
                 diff = res_hist[-1][0] - quantidade_certa
