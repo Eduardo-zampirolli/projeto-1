@@ -60,10 +60,78 @@ limitante = 0 #contador que será utulizado para limitar uma ação a ser realiz
 posicao_esperada = [0] #Lista que indica os valore esperados para a quantidade de cores nas posições corretas, sendo 0 no primeiro palpite
 
 def player(guess_hist, res_hist):
-    
-    
-    
-    
+    global indice_subst
+    global indice_cadicional
+    global cor_tirada
+    global cor_colocada
+    global colors
+    global cores_adicionais
+    global cores_erradas
+    global cores_certas
+    global cores_poss
+    global quantidade_certa
+
+    global dif_pos
+    global dif_cor
+    global dic_cores
+    global limitante
+
+    global pares_trocas
+    global pares_n_trocas
+    global pos_corretas
+    global pos_restantes
+
+    global dic_posicoes
+    global dic_cores
+    global posicao_esperada
+    global indice_cores
+    if len(guess_hist)==0:
+        # Cores disponíveis para o palpite
+        colors = [RED, GREEN, BLUE, YELLOW, ORANGE, BLACK, WHITE]
+        cores_adicionais = [ORANGE, BLACK, WHITE]
+
+        cor_tirada = 0
+        cor_colocada = 0
+
+        cores_certas = []
+        cores_erradas = []
+        cores_poss = []
+
+        indice_subst = 0
+        indice_cadicional = 0
+
+        quantidade_certa = 0
+
+        '''Dicionario que armazena: na primeira lista, as posicoes certas das cores e 
+        a segunda armazena as posiveis posicoes das cores'''
+        dic_cores = {
+            RED:[0,1,2,3],
+            GREEN:[0,1,2,3],
+            BLUE:[0,1,2,3],
+            YELLOW:[0,1,2,3],
+            ORANGE:[0,1,2,3],
+            BLACK:[0,1,2,3],
+            WHITE:[0,1,2,3],
+        }
+        dic_posicoes = {
+            0: [RED, GREEN, BLUE, YELLOW, ORANGE, BLACK, WHITE],
+            1: [RED, GREEN, BLUE, YELLOW, ORANGE, BLACK, WHITE],
+            2: [RED, GREEN, BLUE, YELLOW, ORANGE, BLACK, WHITE],
+            3: [RED, GREEN, BLUE, YELLOW, ORANGE, BLACK, WHITE]
+
+        } #TESTE
+
+        pares_trocas = [] #Lista de pares trocados na permutacao
+        pares_n_trocas = [] #Lista de pares nao trocados na permutacao
+        dif_pos = [] #Lista que salva a diferenca entre o acerto das posicoes corretas entre a ultima e a penultima tentativa
+        dif_cor = [] #Lista que salva a diferenca entre o acerto das posicoes corretas entre a ultima e a penultima tentativa
+        pos_corretas = [] #Listas que armazena quais posicoes foram encontradas
+        pos_restantes = [] #Listas que armazena quais posicoes nao foram encontradas
+
+        indice_cores = 0
+        limitante = 0 #contador que será utulizado para limitar uma ação a ser realizada apenas uma vez, durante a retirada das cores erradas
+        posicao_esperada = [0] #Lista que indica os valore esperados para a quantidade de cores nas posições corretas, sendo 0 no primeiro palpite
+            
     """
     Função principal do jogador.
 
@@ -81,7 +149,7 @@ def player(guess_hist, res_hist):
     return [RED, GREEN, BLUE, YELLOW]
     """
 
-    global indice_subst
+    '''global indice_subst
     global indice_cadicional
     global cor_tirada
     global cor_colocada
@@ -93,7 +161,7 @@ def player(guess_hist, res_hist):
 
     global dif_pos
     global dif_cor
-    global dic_cores
+    global dic_cores'''
 
     acao = 0
 
@@ -275,7 +343,7 @@ def player(guess_hist, res_hist):
 
     #Após achar as 4 cores, buscar as posições corretas
     if len(res_hist) > 0 and res_hist[-1][0] == 4 or len(cores_certas) == 4:
-        global limitante
+        '''global limitante'''
 
         if res_hist[-1][0] == 4: 
             cores_certas = guess_hist[-1]
@@ -297,10 +365,10 @@ def player(guess_hist, res_hist):
                 if cor in cores_certas and type(dic_cores[cor]) == int:
                     dic_posicoes[dic_cores[cor]] = [cor]
         
-        global pares_trocas
+        '''global pares_trocas
         global pares_n_trocas
         global pos_corretas
-        global pos_restantes
+        global pos_restantes'''
         escolha1 = 0
         escolha2 = 0
 
