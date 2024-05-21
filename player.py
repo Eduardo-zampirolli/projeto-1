@@ -60,6 +60,7 @@ limitante = 0 #contador que será utulizado para limitar uma ação a ser realiz
 posicao_esperada = [0] #Lista que indica os valore esperados para a quantidade de cores nas posições corretas, sendo 0 no primeiro palpite
 
 def player(guess_hist, res_hist):
+
     global indice_subst
     global indice_cadicional
     global cor_tirada
@@ -85,6 +86,7 @@ def player(guess_hist, res_hist):
     global dic_cores
     global posicao_esperada
     global indice_cores
+
     if len(guess_hist)==0:
         # Cores disponíveis para o palpite
         colors = [RED, GREEN, BLUE, YELLOW, ORANGE, BLACK, WHITE]
@@ -225,14 +227,16 @@ def player(guess_hist, res_hist):
 
                         cores_certas = cores_poss
                         cores_poss = []
-                        palpite = cores_certas
+                        palpite = substituir_lista(palpite, cores_certas)
+                        cores_certas = palpite
                     
 
                     elif len(cores_poss) + len(cores_erradas) > 3 and len(cores_poss) + len(cores_certas) == 4:
 
                         cores_certas += cores_poss
                         cores_poss = []
-                        palpite = cores_certas
+                        palpite = substituir_lista(palpite, cores_certas)
+                        cores_certas = palpite
 
                     elif len(cores_poss) + len(cores_certas) > 4:
                         cores_erradas += cores_poss
@@ -242,7 +246,8 @@ def player(guess_hist, res_hist):
                             if cor not in cores_erradas:
                                 cores_certas.append(cor)
                                 
-                        palpite = cores_certas
+                        palpite = substituir_lista(palpite, cores_certas)
+                        cores_certas = palpite
                         
                     else:
                         palpite = achar_substituir(palpite, cor_tirada, cor_colocada)
@@ -269,7 +274,8 @@ def player(guess_hist, res_hist):
                         for cor in colors:
                             if cor not in cores_erradas:
                                 cores_certas.append(cor)
-                        palpite = cores_certas
+                        palpite = substituir_lista(palpite, cores_certas)
+                        cores_certas = palpite
                     
                     else:
 
@@ -299,10 +305,14 @@ def player(guess_hist, res_hist):
                         for cor in colors:
                             if cor not in cores_erradas:
                                 cores_certas.append(cor)
-                        palpite = cores_certas
+
+                        palpite = substituir_lista(palpite, cores_certas)
+                        cores_certas = palpite
 
                     elif len(cores_certas) == 4:
-                        palpite = cores_certas
+                        
+                        palpite = substituir_lista(palpite, cores_certas)
+                        cores_certas = palpite
 
                     else:
                         cor_tirada = colors[indice_subst]
@@ -718,3 +728,26 @@ def achar_substituir(lista, novo_item, velho_item):
             lista[i] = novo_item
         
     return lista
+
+
+def substituir_lista(lista1, lista2):
+    '''Recebe 2 listas e coloca em lista 1 os itens de lista2 que não estão em lista 1 '''
+
+    itens_diferentes = []
+    l2 = lista2.copy()
+
+    for i in range(len(lista1)):
+        if lista1[i] not in l2:
+            itens_diferentes.append(lista1[i])
+        else:
+            l2.remove(lista1[i])
+            
+    for item in itens_diferentes:
+        lista1 = achar_substituir(lista1, l2[0], item)
+        l2.pop(0)
+    
+    return lista1
+    
+
+        
+
