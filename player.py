@@ -222,7 +222,7 @@ def player(guess_hist, res_hist):
 
                     if cor_colocada not in cores_poss:
                         cores_poss.append(cor_colocada)
-
+                        
                     indice_subst += 1
 
                     if len(cores_poss) == 4:
@@ -233,14 +233,17 @@ def player(guess_hist, res_hist):
                         cores_certas = palpite
                     
 
-                    elif len(cores_poss) + len(cores_erradas) > 3 and len(cores_poss) + len(cores_certas) == 4:
-
+                    elif len(cores_poss) + len(cores_erradas) > 3 and len(cores_poss) + len(cores_certas) == 4:                      
+                        #casos em que é possivel saber que as cores possiveis estao certas
+                        
                         cores_certas += cores_poss
                         cores_poss = []
                         palpite = substituir_lista(palpite, cores_certas)
                         cores_certas = palpite
 
                     elif len(cores_poss) + len(cores_certas) > 4:
+                        #caso em que é possivel saber que as cores possiveis estao erradas
+                        
                         cores_erradas += cores_poss
                         cores_certas = []
 
@@ -252,6 +255,8 @@ def player(guess_hist, res_hist):
                         cores_certas = palpite
                         
                     else:
+                        #volta a cor que havia sido tirada e insere a cor colocada na proxima posicao
+                        
                         palpite = achar_substituir(palpite, cor_tirada, cor_colocada)
 
                         cor_tirada = colors[indice_subst]
@@ -280,8 +285,9 @@ def player(guess_hist, res_hist):
                         cores_certas = palpite
                     
                     else:
-
-                        palpite = achar_substituir(palpite, cor_tirada, cor_colocada) #cor tirada estava correta
+                        #volta a cor que havia sido tirada e insere uma nova cor na proxima posicao
+                        
+                        palpite = achar_substituir(palpite, cor_tirada, cor_colocada)
 
                         cor_tirada = colors[indice_subst]
                         cor_colocada = cores_adicionais[indice_cadicional]
@@ -317,6 +323,8 @@ def player(guess_hist, res_hist):
                         cores_certas = palpite
 
                     else:
+                        #deixa a cor colocada e insere uma nova cor na proxima posicao
+                        
                         cor_tirada = colors[indice_subst]
                         cor_colocada = cores_adicionais[indice_cadicional]
 
