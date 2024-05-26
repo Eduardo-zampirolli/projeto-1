@@ -22,12 +22,12 @@ cor_colocada = 0
 
 cores_certas = []
 cores_erradas = []
-cores_poss = []
+cores_poss = [] #cores colocadas para avaliação (ou todas estão erradas ou todas estão corretas)
 
-indice_subst = 0
-indice_cadicional = 0
+indice_subst = 0 #indice da cor de colors que sera removida do palpite
+indice_cadicional = 0 #indice da cor adicional que será adicionada ao palpite
 
-quantidade_certa = 0
+quantidade_certa = 0 #guarda o máximo de res_hist[-1][0]
 
 '''Dicionario que armazena: na primeira lista, as posicoes certas das cores e 
 a segunda armazena as posiveis posicoes das cores'''
@@ -165,7 +165,7 @@ def player(guess_hist, res_hist):
     global dif_cor
     global dic_cores'''
 
-    acao = 0
+    acao = 0 #acao realizada dependendo da diferença do numero de cores certas entre palpites
 
     #Armazenando os dados de cada tentativa
     if len(guess_hist) == 1:
@@ -184,13 +184,13 @@ def player(guess_hist, res_hist):
     else:
         palpite = guess_hist[-1].copy()
 
-        if len(cores_erradas) == 3:
+        if len(cores_erradas) == 3: #as não-erradas são as certas
             cores_certas = []
             for cor in colors:
                 if cor not in cores_erradas:
                     cores_certas.append(cor)
         
-        if len(cores_poss) == 4:
+        if len(cores_poss) == 4: #não e possivel todas estarem erradas, logo estao todas certas
             cores_certas = cores_poss
             cores_poss = []
         
@@ -215,7 +215,9 @@ def player(guess_hist, res_hist):
                     acao = 1
 
                 if acao == 0:
-
+                    
+                    #cor tirada e cor colocada sao inseridas na lista de avaliacao
+                    
                     cores_poss.append(cor_tirada)
 
                     if cor_colocada not in cores_poss:
@@ -630,7 +632,7 @@ def achar_substituir(lista, novo_item, velho_item):
 
 
 def substituir_lista(lista1, lista2):
-    '''Recebe 2 listas e coloca em lista 1 os itens de lista2 que não estão em lista 1 '''
+    '''Recebe 2 listas e coloca em <lista1> os itens de <lista2> que não estão em <lista1> '''
 
     itens_diferentes = []
     l2 = lista2.copy()
