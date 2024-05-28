@@ -403,8 +403,8 @@ def player(guess_hist, res_hist):
                     dic_cores[guess_hist[-2][pares_trocas[-1][i]]] = pares_trocas[-1][i]
                     dic_posicoes[pares_trocas[-1][i]] = [guess_hist[-2][pares_trocas[-1][i]]] 
 
-            #Caso a diferença entre as posições não tenha se alterado, ambas as cores trocadas estão em posições erradas, no último e no penúltimo palpite
-            elif dif_pos[-1] == 0:
+            #Caso a diferença entre as posições não tenha se alterado, ambas as cores trocadas estão em posições erradas, no último e no penúltimo palpite caso houve apenas uma permutação
+            elif dif_pos[-1] == 0 and guess_hist[-1][pares_n_trocas[-1][1]] == guess_hist[-2][pares_n_trocas[-1][1]]:
                 #Retirando as posições nas quais as cores estão erradas
                 for i in range(2):
                     if type(dic_cores[cores_certas[pares_trocas[-1][i]]]) == list and pares_trocas[-1][i] in dic_cores[cores_certas[pares_trocas[-1][i]]]:
