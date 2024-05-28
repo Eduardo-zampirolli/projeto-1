@@ -339,6 +339,11 @@ def player(guess_hist, res_hist):
             analise(guess_hist, res_hist, dif_cor[-1], dif_pos[-1])
         if res_hist[-1][0] < 4 and len(cores_certas) < 4:
             #Usando os dados captados durante as analises para escolher uma sequencia otima das cores
+            #Caso a posição de uma cor já tenha sido descoberta, colocá-la nesta posição
+            for posicao in dic_posicoes:
+                if len(dic_posicoes[posicao]) == 1 and indice_da_cor(palpite, dic_posicoes[posicao][0]) != posicao:
+                    palpite = permutacao(palpite,posicao, indice_da_cor(palpite, dic_posicoes[posicao][0]))
+            
             if len(cores_certas) > 0:
                 #Trocando cores de posições antes das 4 cores serem adivinhadas
                 for cor in cores_certas:
@@ -347,10 +352,7 @@ def player(guess_hist, res_hist):
                             if troca in palpite:
                                 return permutacao(palpite, indice_da_cor(palpite,cor), indice_da_cor(palpite, troca))
             
-            #Caso a posição de uma cor já tenha sido descoberta, colocá-la nesta posição
-            for posicao in dic_posicoes:
-                if len(dic_posicoes[posicao]) == 1 and indice_da_cor(palpite, dic_posicoes[posicao][0]) != posicao:
-                    palpite = permutacao(palpite,posicao, indice_da_cor(palpite, dic_posicoes[posicao][0]))
+            
             #Retirar as cores que se encontram em posições erradas
             for posicao in range(4):
                 if palpite[posicao] not in dic_posicoes[posicao]:
@@ -531,38 +533,43 @@ def analise(lista, situacao=[[0,0]], parametro1=0, parametro2=0):
             if len(ult_lista - penult_lista) == 1:
                 cor_nova = (ult_lista - penult_lista).pop()
                 cor_velha = (penult_lista - ult_lista).pop()
-
     #Determinar o valor das posições corretas esperadas
-    
     i = 0
     posicao_esperada[-1] = 0
     for posicao in dic_posicoes:
-            
         if len(dic_posicoes[posicao]) == 1:
             i += 1
             if lista[-1][posicao] == dic_posicoes[posicao][0]:
                 posicao_esperada[-1] += 1
     posicao_esperada.append(i)
         
-            
+    #O aumento esperado consiste na diferença entre as posições corretas esperadas nas duas últimas tentativas
     aumento_esperado = (posicao_esperada[-1] - posicao_esperada[-2])
     if len(cores_certas) < 4 and type(cor_nova) == color:
-        #Comparar se apenas houve troca de posição sem permuta
+        #Comparar se apenas houve troca de posição sem permuta, colocando uma cor neutra sobre as cores permutadas e comparando as duas novas listas
         ult = lista[-1].copy()
         ult[indice_da_cor(ult,cor_nova)] = GRAY
         penult = lista[-2].copy()
         penult[indice_da_cor(penult,cor_velha)] = GRAY
         if ult == penult:
-
-
+            #Caso haja um aumento das cores corretas, então a cor nova estará na posição certa
             if parametro1 >= 0 and (parametro2 - aumento_esperado) > 0:               
                 dic_cores[cor_nova] = (indice_da_cor(lista[-1],cor_nova))
                 dic_posicoes[indice_da_cor(lista[-1],cor_nova)] = [cor_nova]
+            #Caso haja um decréscimo das cores corretas, então a cor velha estava na posição correta
             elif parametro1 <= 0 and (parametro2 - aumento_esperado) < 0:
                 dic_cores[cor_velha] = (indice_da_cor(lista[-2],cor_velha))
                 dic_posicoes[indice_da_cor(lista[-2],cor_velha)] = [cor_velha]
+            #Caso as cores certas aumentem, mas as não haja um aumento imprevisto das posições, então a cor nova se encontra em uma posição errada
             elif type(dic_cores[cor_nova]) == list and parametro1 == 1 and (parametro2 - aumento_esperado) == 0 and indice_da_cor(lista[-1],cor_nova) in dic_cores[cor_nova]:
                 remover(cor_nova, indice_da_cor(lista[-1],cor_nova))
+            #Remover a cor do dicionário caso as cores certas diminuem, mas as posições esperadas se mantenham, então a cor anterior era certa e estava na posição errada
+            elif type(dic_cores[cor_velha]) == list and parametro1 == -1 and (parametro2 - aumento_esperado) == 0 and cor_velha in dic_posicoes[(indice_da_cor(lista[-2],cor_velha))]:
+                remover(cor_velha,indice_da_cor(lista[-2],cor_velha))
+            #Remover a cor do dicionário caso as cores certas aumentem, mas as posições esperadas se mantenham, então a cor atual está certa e está na posição errada
+            elif type(dic_cores[cor_nova]) == list and parametro1 == 1 and (parametro2 - aumento_esperado) == 0 and cor_nova in dic_posicoes[(indice_da_cor(lista[-1],cor_nova))]:
+                remover(cor_nova,indice_da_cor(lista[-1],cor_nova))
+            
 
 
 
@@ -578,12 +585,16 @@ def analise(lista, situacao=[[0,0]], parametro1=0, parametro2=0):
         elif situacao[-1][1] - aumento_esperado - posicao_esperada[-1] == 0:
             #Loop que vai remover todas as cores da listas de posicoes possiveis de uma determinada cor, caso a posicao original ainda não tenha sido encontrada
             for i in range(4):
-                if len(dic_posicoes[i]) > 1 and type(dic_cores[lista[-1][i]]) == list and lista[-1][i] in dic_posicoes[i]:
-                    remover(lista[-1][i], i)
+                if len(dic_posicoes[i]) > 1 and lista[-1][i] in dic_posicoes[i]:
+                    
+                    if type(dic_cores[lista[-1][i]]) == list:
+                        remover(lista[-1][i], i)
+                    else:
+                        dic_posicoes[i].remove(lista[-1][i])
 
         
 
-    #Retirando as posicoes ja encontradas:
+    #Retirando as posicoes ja encontradas
     copia_dic_cores = dic_cores.copy()
     
     for cor in copia_dic_cores:
@@ -592,7 +603,8 @@ def analise(lista, situacao=[[0,0]], parametro1=0, parametro2=0):
                 if type(copia_dic_cores[k]) == list and copia_dic_cores[cor] in copia_dic_cores[k]:
                     remover(k, dic_cores[cor])
     
-    #Analisar caso uma cor seja única em uma posição 
+    
+    #Analisar caso uma cor seja única em uma posição por meio da variável 'cor especial'
     copia_dic_pos = dic_posicoes.copy()
     posicao_especial = 0
     cor_especial = 0
@@ -607,7 +619,7 @@ def analise(lista, situacao=[[0,0]], parametro1=0, parametro2=0):
         if contador == 1 and len(dic_posicoes[posicao_especial]) > 1:
             dic_posicoes[posicao_especial] = [cor_especial]
     
-    #Depois retirar as cores cujas posições já foram encontradas 
+    #Retirar as cores cujas posições já foram encontradas 
     copia_dic_pos = dic_posicoes.copy()
     for posicao in copia_dic_pos:
         if len(dic_posicoes[posicao]) == 1:
@@ -659,4 +671,3 @@ def substituir_lista(lista1, lista2):
     
 
         
-
