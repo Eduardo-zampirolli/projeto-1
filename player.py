@@ -19,7 +19,7 @@ def player(guess_hist, res_hist):
     Exemplo:
     return [RED, GREEN, BLUE, YELLOW]
     """
-    #Nota: uma explicação mais aprofundada do código desse arquivo se encontra em comentario.txt
+    #Nota: uma explicação mais aprofundada do código desse arquivo se encontra em comentario.doc
     global indice_subst
     global indice_cadicional
     global cor_tirada
