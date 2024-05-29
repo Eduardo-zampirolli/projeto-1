@@ -49,7 +49,7 @@ def player(guess_hist, res_hist):
     if len(guess_hist)==0:
         # Cores disponíveis para o palpite
         colors = [RED, GREEN, BLUE, YELLOW, ORANGE, BLACK, WHITE]
-        cores_adicionais = [ORANGE, BLACK, WHITE]
+        cores_adicionais = [ORANGE, BLACK, WHITE] #cores que serão usadas nas substituicoes
 
         cor_tirada = 0
         cor_colocada = 0
